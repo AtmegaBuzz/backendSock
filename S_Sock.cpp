@@ -7,7 +7,6 @@
 #include <string.h>
 #include <string>
  
-using namespace std;
  
 int main()
 {
@@ -15,7 +14,7 @@ int main()
     int listening = socket(AF_INET, SOCK_STREAM, 0);
     if (listening == -1)
     {
-        cerr << "Can't create a socket! Quitting" << endl;
+        std::cerr << "Can't create a socket! Quitting" << std::endl;
         return -1;
     }
  
@@ -25,7 +24,9 @@ int main()
     hint.sin_port = htons(54000);
     inet_pton(AF_INET, "0.0.0.0", &hint.sin_addr);
  
-    bind(listening, (sockaddr*)&hint, sizeof(hint));
+    if(bind(listening, (sockaddr*)&hint, sizeof(hint)), sizeof(hint)==-1){
+        std::cerr << "socker bind failed";
+    };
  
     // Tell Winsock the socket is for listening
     listen(listening, SOMAXCONN);
@@ -44,12 +45,12 @@ int main()
  
     if (getnameinfo((sockaddr*)&client, sizeof(client), host, NI_MAXHOST, service, NI_MAXSERV, 0) == 0)
     {
-        cout << host << " connected on port " << service << endl;
+        std::cout << host << " connected on port " << service << std::endl;
     }
     else
     {
         inet_ntop(AF_INET, &client.sin_addr, host, NI_MAXHOST);
-        cout << host << " connected on port " << ntohs(client.sin_port) << endl;
+        std::cout << host << " connected on port " << ntohs(client.sin_port) << std::endl;
     }
  
     // Close listening socket
@@ -66,17 +67,17 @@ int main()
         int bytesReceived = recv(clientSocket, buf, 4096, 0);
         if (bytesReceived == -1)
         {
-            cerr << "Error in recv(). Quitting" << endl;
+            std::cerr << "Error in recv(). Quitting" << std::endl;
             break;
         }
  
         if (bytesReceived == 0)
         {
-            cout << "Client disconnected " << endl;
+            std::cout << "Client disconnected " << std::endl;
             break;
         }
  
-        cout << string(buf, 0, bytesReceived) << endl;
+        std::cout << std::string(buf, 0, bytesReceived) << std::endl;
  
         // Echo message back to client
         send(clientSocket, buf, bytesReceived + 1, 0);
